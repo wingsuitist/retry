@@ -46,6 +46,7 @@ func setupApp() *cli.App {
 			timeout := c.Duration("t")
 			verbose := c.Bool("v")
 
+			var err error
 			var lastOutput bytes.Buffer
 
 			for i := 0; i < count; i++ {
@@ -54,26 +55,36 @@ func setupApp() *cli.App {
 				defer cancel()
 
 				cmd := exec.CommandContext(ctx, "bash", "-c", cmdStr)
-				lastOutput.Reset()
-				cmd.Stdout = &lastOutput
-				cmd.Stderr = &lastOutput
+				var buffer bytes.Buffer
+				cmd.Stdout = &buffer
+				cmd.Stderr = &buffer
 
 				if verbose {
-					cmd.Stdout = io.MultiWriter(os.Stdout, &lastOutput)
-					cmd.Stderr = io.MultiWriter(os.Stderr, &lastOutput)
+					cmd.Stdout = io.MultiWriter(os.Stdout, &buffer)
+					cmd.Stderr = io.MultiWriter(os.Stderr, &buffer)
 				}
 
-				err := cmd.Run()
+				err = cmd.Run()
+
+				if !verbose {
+					lastOutput = buffer
+				}
+
 				if err == nil {
-					return nil
+					break
 				}
-
 				time.Sleep(interval)
 			}
 
-			fmt.Println("Last command output:")
-			fmt.Println(lastOutput.String())
-			return fmt.Errorf("command failed after %d retries", count)
+			if !verbose {
+				fmt.Println("Last command output:")
+				fmt.Println(lastOutput.String())
+			}
+
+			if err != nil {
+				return fmt.Errorf("command failed after %d retries", count)
+			}
+			return nil
 		},
 	}
 }
