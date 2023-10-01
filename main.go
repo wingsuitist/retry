@@ -16,24 +16,28 @@ func setupApp() *cli.App {
 	return &cli.App{
 		Flags: []cli.Flag{
 			&cli.IntFlag{
-				Name:  "c",
-				Value: 1,
-				Usage: "Number of retries",
+				Name:    "count",
+				Aliases: []string{"c"},
+				Value:   1,
+				Usage:   "Number of retries",
 			},
 			&cli.DurationFlag{
-				Name:  "i",
-				Value: 1 * time.Second,
-				Usage: "Interval between retries",
+				Name:    "interval",
+				Aliases: []string{"i"},
+				Value:   1 * time.Second,
+				Usage:   "Interval between retries",
 			},
 			&cli.DurationFlag{
-				Name:  "t",
-				Value: 1 * time.Second,
-				Usage: "Timeout for each command run",
+				Name:    "timeout",
+				Aliases: []string{"t"},
+				Value:   1 * time.Second,
+				Usage:   "Timeout for each command run",
 			},
 			&cli.BoolFlag{
-				Name:  "v",
-				Value: false,
-				Usage: "Verbose output",
+				Name:    "verbose",
+				Aliases: []string{"v"},
+				Value:   false,
+				Usage:   "Verbose output",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -41,13 +45,13 @@ func setupApp() *cli.App {
 				return fmt.Errorf("no command provided")
 			}
 			cmdStr := c.Args().Slice()[0]
-			count := c.Int("c")
-			interval := c.Duration("i")
-			timeout := c.Duration("t")
-			verbose := c.Bool("v")
+			count := c.Int("count")
+			interval := c.Duration("interval")
+			timeout := c.Duration("timeout")
+			verbose := c.Bool("verbose")
 
 			var err error
-			var lastOutput bytes.Buffer
+			var lastStdout, lastStderr bytes.Buffer
 
 			for i := 0; i < count; i++ {
 				fmt.Printf("retrying %d of %d\n", i+1, count)
@@ -55,20 +59,19 @@ func setupApp() *cli.App {
 				defer cancel()
 
 				cmd := exec.CommandContext(ctx, "bash", "-c", cmdStr)
-				var buffer bytes.Buffer
-				cmd.Stdout = &buffer
-				cmd.Stderr = &buffer
+				var stdout, stderr bytes.Buffer
+				cmd.Stdout = &stdout
+				cmd.Stderr = &stderr
 
 				if verbose {
-					cmd.Stdout = io.MultiWriter(os.Stdout, &buffer)
-					cmd.Stderr = io.MultiWriter(os.Stderr, &buffer)
+					cmd.Stdout = io.MultiWriter(os.Stdout, &stdout)
+					cmd.Stderr = io.MultiWriter(os.Stderr, &stderr)
 				}
 
 				err = cmd.Run()
 
-				if !verbose {
-					lastOutput = buffer
-				}
+				lastStdout = stdout
+				lastStderr = stderr
 
 				if err == nil {
 					break
@@ -76,10 +79,9 @@ func setupApp() *cli.App {
 				time.Sleep(interval)
 			}
 
-			if !verbose {
-				fmt.Println("Last command output:")
-				fmt.Println(lastOutput.String())
-			}
+			fmt.Println("Last command output:")
+			fmt.Printf("STDOUT:\n%s", lastStdout.String())
+			fmt.Printf("STDERR:\n%s", lastStderr.String())
 
 			if err != nil {
 				return fmt.Errorf("command failed after %d retries", count)
