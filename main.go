@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"time"
@@ -44,7 +43,7 @@ func setupApp() *cli.App {
 			if c.Args().Len() == 0 {
 				return fmt.Errorf("no command provided")
 			}
-			cmdStr := c.Args().Slice()[0]
+			cmdStr := strings.Join(c.Args().Slice(), " ")
 			count := c.Int("count")
 			interval := c.Duration("interval")
 			timeout := c.Duration("timeout")
@@ -54,34 +53,38 @@ func setupApp() *cli.App {
 			var lastStdout, lastStderr bytes.Buffer
 
 			for i := 0; i < count; i++ {
-				fmt.Printf("retrying %d of %d\n", i+1, count)
+				if verbose {
+					fmt.Fprintf(os.Stderr, "retrying %d of %d\n", i+1, count)
+				}
 				ctx, cancel := context.WithTimeout(context.Background(), timeout)
 				defer cancel()
 
 				cmd := exec.CommandContext(ctx, "bash", "-c", cmdStr)
+				cmd.Env = os.Environ()
+
 				var stdout, stderr bytes.Buffer
 				cmd.Stdout = &stdout
 				cmd.Stderr = &stderr
-
-				if verbose {
-					cmd.Stdout = io.MultiWriter(os.Stdout, &stdout)
-					cmd.Stderr = io.MultiWriter(os.Stderr, &stderr)
-				}
 
 				err = cmd.Run()
 
 				lastStdout = stdout
 				lastStderr = stderr
 
+				if err == nil || verbose || i == count-1 {
+					if lastStdout.Len() > 0 {
+						os.Stdout.Write(lastStdout.Bytes())
+					}
+					if lastStderr.Len() > 0 {
+						os.Stderr.Write(lastStderr.Bytes())
+					}
+				}
+
 				if err == nil {
 					break
 				}
 				time.Sleep(interval)
 			}
-
-			fmt.Println("Last command output:")
-			fmt.Printf("STDOUT:\n%s", lastStdout.String())
-			fmt.Printf("STDERR:\n%s", lastStderr.String())
 
 			if err != nil {
 				return fmt.Errorf("command failed after %d retries", count)
@@ -95,6 +98,6 @@ func main() {
 	app := setupApp()
 	err := app.Run(os.Args)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 	}
 }

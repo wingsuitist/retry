@@ -18,5 +18,9 @@ func TestRetryCommand(t *testing.T) {
 		t.Errorf("Expected no error, got %v", err)
 	}
 	
-	// The timeout test would be difficult to implement here without mocking, skipping it for now.
+	args = []string{"retry", "-c", "3", "-v", "-i", "1s", "-t", "1s", "--", "echo error 1>&2; false"}
+	err = app.Run(args)
+	if err == nil {
+		t.Errorf("Expected error, got none")
+	}
 }
