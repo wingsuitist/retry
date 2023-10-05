@@ -14,17 +14,20 @@ import (
 
 func setupApp() *cli.App {
 	return &cli.App{
+		Usage: "The missing retry command",
+		UsageText: "retry [options] -- command",
+		HideHelpCommand:  true,
 		Flags: []cli.Flag{
 			&cli.IntFlag{
 				Name:    "count",
 				Aliases: []string{"c"},
-				Value:   1,
+				Value:   5,
 				Usage:   "Number of retries",
 			},
 			&cli.DurationFlag{
 				Name:    "interval",
 				Aliases: []string{"i"},
-				Value:   1 * time.Second,
+				Value:   3 * time.Second,
 				Usage:   "Interval between retries",
 			},
 			&cli.DurationFlag{
