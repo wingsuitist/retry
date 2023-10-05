@@ -30,7 +30,7 @@ jobs:
       env:
         GOOS: linux
         GOARCH: amd64
-      run: go build -v -o build/retry-${{ env.GOOS }}-${{ env.GOARCH }}
+      run: go build -v -o build/retry-${{ env.GOOS }}-${{ env.GOARCH }} ./cmd/main.go
 
   release:
     needs: build
