@@ -103,5 +103,6 @@ func main() {
 	err := app.Run(os.Args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
