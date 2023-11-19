@@ -6,17 +6,17 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"time"
 	"strings"
-	
+	"time"
+
 	"github.com/urfave/cli/v2"
 )
 
 func setupApp() *cli.App {
 	return &cli.App{
-		Usage: "The missing retry command",
-		UsageText: "retry [options] -- command",
-		HideHelpCommand:  true,
+		Usage:           "The missing retry command",
+		UsageText:       "retry [options] -- command",
+		HideHelpCommand: true,
 		Flags: []cli.Flag{
 			&cli.IntFlag{
 				Name:    "count",
@@ -91,7 +91,8 @@ func setupApp() *cli.App {
 			}
 
 			if err != nil {
-				return fmt.Errorf("command failed after %d retries", count)
+				fmt.Fprintf(os.Stderr, "command failed after %d retries: %v\n", count, err)
+				return cli.Exit("", 1)
 			}
 			return nil
 		},
