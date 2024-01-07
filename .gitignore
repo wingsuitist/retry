@@ -25,3 +25,5 @@ retry
 .local*
 build/*
 tmp/*
+
+.DS_Store
