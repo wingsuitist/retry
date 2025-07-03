@@ -53,3 +53,16 @@ For Windows, you will need a tool that can extract tar.gz archive like 7-Zip.
 1. Download your architecture's `.tar.gz` file from the [releases page](https://github.com/wingsuitist/retry/releases)
 2. Extract both the outer `.tar.gz` file and the resulting `.tar` file with 7-Zip.
 3. From the extracted files you can move the `retry.exe` to `C:\Windows\`.
+
+### Homebrew (macOS and Linux)
+
+You can install the `retry` command with [Homebrew](https://brew.sh/):
+
+```sh
+brew tap wingsuitist/retry
+brew install wingsuitist/retry/retry
+```
+
+The Homebrew formula is automatically updated by the release workflow whenever a
+new version of `retry` is published.
+
