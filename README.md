@@ -56,10 +56,10 @@ For Windows, you will need a tool that can extract tar.gz archive like 7-Zip.
 
 ### Homebrew (macOS and Linux)
 
-You can install the `retry` command with [Homebrew](https://brew.sh/):
+You can install the `retry` command with [Homebrew](https://brew.sh/). Since the formula lives in this repository you need to provide its URL when tapping:
 
 ```sh
-brew tap wingsuitist/retry
+brew tap wingsuitist/retry https://github.com/wingsuitist/retry
 brew install wingsuitist/retry/retry
 ```
 
