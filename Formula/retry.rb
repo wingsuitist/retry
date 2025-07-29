@@ -1,9 +1,12 @@
 class Retry < Formula
   desc "The missing retry command"
   homepage "https://github.com/wingsuitist/retry"
-  version "0.0.7"
+  url "https://github.com/wingsuitist/retry/archive/refs/tags/v0.0.7.tar.gz"
+  sha256 "fb6a81d07c32456f7da6db36cfca7339ee285e6398ee258b7003c1b971895580"
   license "MIT"
+  version "0.0.7"
 
+  # Pre-compiled binaries (preferred for speed)
   on_macos do
     if Hardware::CPU.intel?
       url "https://github.com/wingsuitist/retry/releases/download/v0.0.7/retry_0.0.7_Darwin_x86_64.tar.gz"
@@ -33,8 +36,16 @@ class Retry < Formula
     end
   end
 
+  depends_on "go" => :build
+
   def install
-    bin.install "retry"
+    if build.bottle?
+      # Install pre-compiled binary
+      bin.install "retry"
+    else
+      # Build from source
+      system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd"
+    end
   end
 
   test do
