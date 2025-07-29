@@ -1,34 +1,34 @@
 class Retry < Formula
   desc "The missing retry command"
   homepage "https://github.com/wingsuitist/retry"
-  version "0.0.6"
+  version "0.0.7"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/wingsuitist/retry/releases/download/v0.0.6/retry_0.0.6_Darwin_x86_64.tar.gz"
-      sha256 "c8c775135ccbbeda36b9652b6fcb594b508396fd8b8320e4265f118b7d07ce8c"
+      url "https://github.com/wingsuitist/retry/releases/download/v0.0.7/retry_0.0.7_Darwin_x86_64.tar.gz"
+      sha256 "4d93a6afc50199b6d761265a524b98cc6611e0bca3a3f99e1b971746e3eadfcd"
     end
     if Hardware::CPU.arm?
-      url "https://github.com/wingsuitist/retry/releases/download/v0.0.6/retry_0.0.6_Darwin_arm64.tar.gz"
-      sha256 "d4db7e7199eb99b76d482efdfd5d18e0aee4e3a75f151ecdfe9ef3f0a871d963"
+      url "https://github.com/wingsuitist/retry/releases/download/v0.0.7/retry_0.0.7_Darwin_arm64.tar.gz"
+      sha256 "c5490b4207cb5598d649d34d40649a4ee17bb5ec2fe9a3268a2b0fe29c52fb4b"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/wingsuitist/retry/releases/download/v0.0.6/retry_0.0.6_Linux_x86_64.tar.gz"
-        sha256 "68f075fdade4d35c2caeed328a4e0aea7e51a80a19c3208cce5a939cad6017fd"
+        url "https://github.com/wingsuitist/retry/releases/download/v0.0.7/retry_0.0.7_Linux_x86_64.tar.gz"
+        sha256 "54aedf0b06b8a558f033bae32ef606ccf318d3b82a869e9edd9b20fb1b4b7978"
       else
-        url "https://github.com/wingsuitist/retry/releases/download/v0.0.6/retry_0.0.6_Linux_i386.tar.gz"
-        sha256 "a87a095ca8214b6aae270f9fbfcaa7551c7d251993b04742b27fdad0823d2d9f"
+        url "https://github.com/wingsuitist/retry/releases/download/v0.0.7/retry_0.0.7_Linux_i386.tar.gz"
+        sha256 "06a0527e38ab4206e78fbf8aa107a60ad725b75338c16919e1e335e048031747"
       end
     end
     if Hardware::CPU.arm?
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/wingsuitist/retry/releases/download/v0.0.6/retry_0.0.6_Linux_arm64.tar.gz"
-        sha256 "cd5c8992b0b9aff7557d62c327668cf7d21f0daeb35af154a471e0e53a61b05a"
+        url "https://github.com/wingsuitist/retry/releases/download/v0.0.7/retry_0.0.7_Linux_arm64.tar.gz"
+        sha256 "b0a326b65a1d0f35fe93b2ad51511ac17cc406e80ac8cfea91bd7bbaf908a56b"
       end
     end
   end
