@@ -39,7 +39,7 @@ jobs:
           # Ensure we're on the main branch
           git checkout main
           
-          # Download checksums
+          # Download checksums for pre-compiled binaries
           curl -L -o checksums.txt "https://github.com/wingsuitist/retry/releases/download/v${VERSION}/checksums.txt"
           
           # Extract checksums for each platform
@@ -49,20 +49,27 @@ jobs:
           LINUX_I386_SHA=$(grep "retry_${VERSION}_Linux_i386.tar.gz" checksums.txt | cut -d' ' -f1)
           LINUX_ARM64_SHA=$(grep "retry_${VERSION}_Linux_arm64.tar.gz" checksums.txt | cut -d' ' -f1)
           
+          # Get source archive SHA256
+          SOURCE_SHA=$(curl -L "https://github.com/wingsuitist/retry/archive/refs/tags/v${VERSION}.tar.gz" | sha256sum | cut -d' ' -f1)
+          
           # Update version in formula
           sed -i "s/version \".*\"/version \"${VERSION}\"/" Formula/retry.rb
           
-          # Update URLs and checksums
+          # Update source URL and SHA256
+          sed -i "s|archive/refs/tags/v[0-9.]*.tar.gz|archive/refs/tags/v${VERSION}.tar.gz|g" Formula/retry.rb
+          sed -i "0,/sha256 \".*\"/{s/sha256 \".*\"/sha256 \"${SOURCE_SHA}\"/}" Formula/retry.rb
+          
+          # Update binary URLs and checksums
           sed -i "s|retry_[0-9.]*_Darwin_x86_64.tar.gz|retry_${VERSION}_Darwin_x86_64.tar.gz|g" Formula/retry.rb
           sed -i "s|retry_[0-9.]*_Darwin_arm64.tar.gz|retry_${VERSION}_Darwin_arm64.tar.gz|g" Formula/retry.rb
           sed -i "s|retry_[0-9.]*_Linux_x86_64.tar.gz|retry_${VERSION}_Linux_x86_64.tar.gz|g" Formula/retry.rb
           sed -i "s|retry_[0-9.]*_Linux_i386.tar.gz|retry_${VERSION}_Linux_i386.tar.gz|g" Formula/retry.rb
           sed -i "s|retry_[0-9.]*_Linux_arm64.tar.gz|retry_${VERSION}_Linux_arm64.tar.gz|g" Formula/retry.rb
           
-          # Update version in URLs
-          sed -i "s|/v[0-9.]*/|/v${VERSION}/|g" Formula/retry.rb
+          # Update version in binary URLs
+          sed -i "s|/v[0-9.]*/retry_|/v${VERSION}/retry_|g" Formula/retry.rb
           
-          # Update checksums
+          # Update binary checksums
           sed -i "/Darwin_x86_64.tar.gz/,+1s/sha256 \".*\"/sha256 \"${DARWIN_X86_64_SHA}\"/" Formula/retry.rb
           sed -i "/Darwin_arm64.tar.gz/,+1s/sha256 \".*\"/sha256 \"${DARWIN_ARM64_SHA}\"/" Formula/retry.rb
           sed -i "/Linux_x86_64.tar.gz/,+1s/sha256 \".*\"/sha256 \"${LINUX_X86_64_SHA}\"/" Formula/retry.rb
@@ -73,5 +80,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add Formula/retry.rb
-          git commit -m "chore: update Homebrew formula to v${VERSION} with pre-compiled binaries" || exit 0
+          git commit -m "chore: update Homebrew formula to v${VERSION} with pre-compiled binaries and source fallback" || exit 0
           git push origin main
