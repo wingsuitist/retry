@@ -51,19 +51,6 @@ changelog:
       - '^test:'
       - '^chore:'
 
-brews:
-  - name: retry
-    repository:
-      owner: wingsuitist
-      name: homebrew-retry
-      token: "{{ .Env.GITHUB_TOKEN }}"
-    homepage: "https://github.com/wingsuitist/retry"
-    description: "The missing retry command"
-    license: "MIT"
-    test: |
-      system "#{bin}/retry", "-h"
-    install: |-
-      bin.install "retry"
 
 release:
   github:
