@@ -49,15 +49,8 @@ jobs:
           LINUX_I386_SHA=$(grep "retry_${VERSION}_Linux_i386.tar.gz" checksums.txt | cut -d' ' -f1)
           LINUX_ARM64_SHA=$(grep "retry_${VERSION}_Linux_arm64.tar.gz" checksums.txt | cut -d' ' -f1)
           
-          # Get source archive SHA256
-          SOURCE_SHA=$(curl -L "https://github.com/wingsuitist/retry/archive/refs/tags/v${VERSION}.tar.gz" | sha256sum | cut -d' ' -f1)
-          
           # Update version in formula
           sed -i "s/version \".*\"/version \"${VERSION}\"/" Formula/retry.rb
-          
-          # Update source URL and SHA256
-          sed -i "s|archive/refs/tags/v[0-9.]*.tar.gz|archive/refs/tags/v${VERSION}.tar.gz|g" Formula/retry.rb
-          sed -i "0,/sha256 \".*\"/{s/sha256 \".*\"/sha256 \"${SOURCE_SHA}\"/}" Formula/retry.rb
           
           # Update binary URLs and checksums
           sed -i "s|retry_[0-9.]*_Darwin_x86_64.tar.gz|retry_${VERSION}_Darwin_x86_64.tar.gz|g" Formula/retry.rb
