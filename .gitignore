@@ -26,4 +26,4 @@ retry
 build/*
 tmp/*
 
-.DS_Store
+.DS_Storedist/

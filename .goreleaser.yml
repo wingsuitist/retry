@@ -1,2 +1,74 @@
+before:
+  hooks:
+    - go mod tidy
+
 builds:
-- main: ./cmd/
+  - main: ./cmd/
+    id: "retry"
+    binary: retry
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - "386"
+    ignore:
+      - goos: darwin
+        goarch: "386"
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+
+brews:
+  - name: retry
+    repository:
+      owner: wingsuitist
+      name: homebrew-retry
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    homepage: "https://github.com/wingsuitist/retry"
+    description: "The missing retry command"
+    license: "MIT"
+    test: |
+      system "#{bin}/retry", "-h"
+    install: |-
+      bin.install "retry"
+
+release:
+  github:
+    owner: wingsuitist
+    name: retry
+  draft: false
+  prerelease: auto
+  mode: replace

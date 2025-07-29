@@ -66,3 +66,36 @@ brew install wingsuitist/retry/retry
 The Homebrew formula is automatically updated by the release workflow whenever a
 new version of `retry` is published.
 
+## Development
+
+### Building from Source
+
+```sh
+git clone https://github.com/wingsuitist/retry.git
+cd retry
+go build -o retry ./cmd/
+```
+
+### Testing the Release Process
+
+Use the provided test script to verify the GoReleaser configuration:
+
+```sh
+./test-release.sh
+```
+
+### Creating a New Release
+
+1. Update version information if needed
+2. Create and push a new tag:
+   ```sh
+   git tag v0.0.6
+   git push origin v0.0.6
+   ```
+3. The GitHub Action will automatically:
+   - Build cross-platform binaries for Linux, macOS, and Windows
+   - Create a GitHub release with downloadable assets
+   - Update the Homebrew formula with binary downloads and correct checksums
+   - Support both Intel and ARM architectures
+
+This ensures that Linux Homebrew users get pre-compiled binaries instead of having to build from source.
