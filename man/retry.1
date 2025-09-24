@@ -1,0 +1,77 @@
+.TH RETRY 1 "October 2023" "retry" "User Commands"
+.SH NAME
+retry \- the missing retry command
+.SH SYNOPSIS
+.B retry
+.RI [ options ]
+.B \-\-
+.I command
+.SH DESCRIPTION
+.B retry
+automatically re-runs a shell command until it succeeds or the configured
+maximum number of attempts is reached. The command is executed via
+.BR "bash -c" ,
+so shell features such as pipelines and environment expansion are available.
+.PP
+Options must appear before the command to run. Use
+.B \-\-
+to terminate option parsing when the wrapped command accepts its own flags.
+.PP
+On every invocation the command's standard input, output, and environment are
+the same as
+.B retry
+unless otherwise redirected. Command output is printed after a successful run.
+When
+.B \-\-verbose
+is enabled, the command's output from every attempt is streamed and
+informational messages of the form "retrying N of M" are written to standard
+error. If all attempts fail a final diagnostic message is printed before
+.B retry
+exits with status 1.
+.SH OPTIONS
+.TP
+.BR \-c , \-\-count " " \fIn\fR
+Number of attempts to make. The default is 5.
+.TP
+.BR \-i , \-\-interval " " \fIduration\fR
+Time to wait between attempts. The default is 3s.
+.TP
+.BR \-t , \-\-timeout " " \fIduration\fR
+Maximum running time allowed for each individual attempt. The default is 1s.
+When the timeout expires the running command is terminated and the next
+attempt begins after the configured interval.
+.TP
+.BR \-v , \-\-verbose
+Print progress messages before every attempt and stream the command's output
+for each retry. Without this flag the output from failed attempts is
+suppressed until the final try.
+.TP
+.BR \-h , \-\-help
+Show help and exit.
+.PP
+Durations accept any value understood by the Go standard library function
+.BR time.ParseDuration (3),
+such as
+.BR 500ms ,
+.BR 2s ,
+or
+.BR 1m30s .
+.SH EXIT STATUS
+.TP
+.B 0
+The command succeeded before the retry limit was reached.
+.TP
+.B 1
+The command failed after exhausting all retries, or no command was provided.
+.SH EXAMPLES
+.TP
+.B retry \-c 10 \-i 1s \-\- curl https://example.com/api
+Retry the HTTP request up to 10 times, waiting one second between attempts.
+.TP
+.B retry \-t 10s \-\- make flaky-test
+Retry running
+.B make flaky-test
+with a per-attempt timeout of 10 seconds.
+.SH SEE ALSO
+.BR timeout (1),
+.BR watch (1)
